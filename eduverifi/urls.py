@@ -15,8 +15,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django_otp.admin import OTPAdminSite
+from two_factor.urls import urlpatterns as tf_urls
+
+# Replace the default admin site with OTP-protected admin
+admin.site.__class__ = OTPAdminSite
+admin.site.site_header = 'EduVerifi Admin'
+admin.site.site_title = 'EduVerifi Admin Portal'
 
 urlpatterns = [
+    # Include two_factor URLs at root for admin compatibility
+    path('', include(tf_urls)),
+    # Admin panel
     path('admin/', admin.site.urls),
 ]

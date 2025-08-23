@@ -1,0 +1,143 @@
+{% extends "two_factor/_base.html" %}
+{% load i18n %}
+
+{% block title %}Setup Two-Factor Authentication - EduVerifi Admin{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Two-Factor Authentication Setup</h1>
+    <p>Secure your admin account</p>
+</div>
+
+<div class="content">
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ wizard.management_form }}
+
+        {% if wizard.steps.current == 'welcome' %}
+            <div class="text-center mb-3">
+                <h3>Welcome to Two-Factor Setup</h3>
+                <p class="text-muted mt-2">
+                    Two-factor authentication adds an extra layer of security to your account.
+                    You'll need your phone with an authenticator app installed.
+                </p>
+            </div>
+            
+            <button type="submit" class="btn">Get Started →</button>
+
+        {% elif wizard.steps.current == 'method' %}
+            <h3 class="mb-3">Choose Authentication Method</h3>
+            
+            <div class="form-row">
+                {{ wizard.form }}
+            </div>
+            
+            <button type="submit" class="btn">Continue →</button>
+
+        {% elif wizard.steps.current == 'generator' %}
+            <h3 class="mb-3">Scan QR Code</h3>
+            
+            {% if QR_URL %}
+                <div class="qr-code">
+                    <img src="{{ QR_URL }}" alt="QR Code">
+                    <div class="help-text mt-2">
+                        Scan this code with Google Authenticator, Authy, or similar app
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="divider"></div>
+            
+            <h4 class="mb-2">Can't scan?</h4>
+            <div class="help-text mb-3">
+                Enter this key manually: <strong style="font-family: monospace;">{{ secret_key }}</strong>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="form-row">
+                <label for="id_generator-token">Verification Code</label>
+                <input type="text" name="generator-token" id="id_generator-token" 
+                       autocomplete="off" inputmode="numeric" maxlength="6"
+                       placeholder="000000" required autofocus>
+                <div class="help-text">
+                    Enter the 6-digit code from your authenticator app to verify setup
+                </div>
+                {% if wizard.form.token.errors %}
+                    <ul class="errorlist">
+                        {% for error in wizard.form.token.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <button type="submit" class="btn">Verify & Complete Setup</button>
+
+        {% elif wizard.steps.current == 'sms' or wizard.steps.current == 'call' %}
+            <h3 class="mb-3">Phone Number</h3>
+            
+            <div class="form-row">
+                <label for="id_{{ wizard.steps.current }}-number">Phone Number</label>
+                {{ wizard.form.number }}
+                <div class="help-text">
+                    {% if wizard.steps.current == 'sms' %}
+                        We'll send you a text message with a verification code
+                    {% else %}
+                        We'll call you with a verification code
+                    {% endif %}
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Send Code →</button>
+
+        {% elif wizard.steps.current == 'validation' %}
+            <h3 class="mb-3">Enter Verification Code</h3>
+            
+            <div class="form-row">
+                <label for="id_validation-token">Verification Code</label>
+                {{ wizard.form.token }}
+                <div class="help-text">
+                    Enter the code we sent to your phone
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Verify →</button>
+
+        {% else %}
+            {% for field in wizard.form %}
+                <div class="form-row">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="help-text">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn">Continue →</button>
+        {% endif %}
+    </form>
+</div>
+
+<div class="footer">
+    <div class="text-center text-muted">
+        Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}
+    </div>
+</div>
+{% endblock %}

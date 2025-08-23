@@ -1,0 +1,37 @@
+{% extends "admin_login/base.html" %}
+
+{% block title %}2FA Profile - EduVerifi{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Two-Factor Authentication Settings</h1>
+    <p>Manage your 2FA devices and settings</p>
+</div>
+
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="notice">
+    {% if default_device %}
+        ✅ Two-factor authentication is <strong>enabled</strong>
+        <p>Device: {{ default_device.name }}</p>
+    {% else %}
+        ⚠️ Two-factor authentication is <strong>not configured</strong>
+    {% endif %}
+</div>
+
+<div class="links">
+    {% if default_device %}
+        <p><a href="{% url 'admin_login:setup' %}">Add another device</a></p>
+        <p><a href="/admin/">Go to Admin Panel →</a></p>
+    {% else %}
+        <p><a href="{% url 'admin_login:setup' %}">Setup Two-Factor Authentication</a></p>
+    {% endif %}
+    <p><a href="{% url 'admin_login:logout' %}">Logout</a></p>
+</div>
+{% endblock %}

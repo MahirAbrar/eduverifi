@@ -1,0 +1,147 @@
+{% extends "two_factor/_base.html" %}
+{% load i18n %}
+
+{% block title %}Login - EduVerifi Admin{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>EduVerifi Administration</h1>
+    <p>Secure access portal</p>
+</div>
+
+<div class="content">
+    {% if wizard.steps.current == 'auth' %}
+        <div class="wizard-step">
+            <div class="wizard-step-item active">Credentials</div>
+            <div class="wizard-step-item">Verification</div>
+        </div>
+    {% elif wizard.steps.current == 'token' %}
+        <div class="wizard-step">
+            <div class="wizard-step-item">Credentials</div>
+            <div class="wizard-step-item active">Verification</div>
+        </div>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        <div class="messages">
+            {% for error in form.non_field_errors %}
+                <div class="message error">{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ wizard.management_form }}
+
+        {% if wizard.steps.current == 'auth' %}
+            <div class="form-row">
+                <label for="id_auth-username">Username</label>
+                <input type="text" name="auth-username" id="id_auth-username" 
+                       required autofocus maxlength="150"
+                       value="{{ wizard.form.auth.username.value|default:'' }}">
+                {% if wizard.form.auth.username.errors %}
+                    <ul class="errorlist">
+                        {% for error in wizard.form.auth.username.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                <label for="id_auth-password">Password</label>
+                <input type="password" name="auth-password" id="id_auth-password" required>
+                {% if wizard.form.auth.password.errors %}
+                    <ul class="errorlist">
+                        {% for error in wizard.form.auth.password.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn">Continue →</button>
+
+        {% elif wizard.steps.current == 'token' %}
+            <div class="form-row">
+                <label for="id_token-otp_token">Verification Code</label>
+                <input type="text" name="token-otp_token" id="id_token-otp_token" 
+                       autocomplete="off" inputmode="numeric" maxlength="6"
+                       placeholder="000000" required autofocus>
+                <div class="help-text">
+                    Enter the 6-digit code from your authenticator app
+                </div>
+                {% if wizard.form.token.otp_token.errors %}
+                    <ul class="errorlist">
+                        {% for error in wizard.form.token.otp_token.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn">Verify & Login</button>
+            
+            <div class="divider"></div>
+            
+            <div class="text-center">
+                <a href="{% url 'two_factor:login' %}">← Back to login</a>
+            </div>
+
+        {% elif wizard.steps.current == 'backup' %}
+            <div class="form-row">
+                <label for="id_backup-otp_token">Backup Token</label>
+                <input type="text" name="backup-otp_token" id="id_backup-otp_token" 
+                       autocomplete="off" required autofocus>
+                <div class="help-text">
+                    Enter one of your backup tokens
+                </div>
+                {% if wizard.form.backup.otp_token.errors %}
+                    <ul class="errorlist">
+                        {% for error in wizard.form.backup.otp_token.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn">Verify Backup Token</button>
+
+        {% else %}
+            {% for field in wizard.form %}
+                <div class="form-row">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="help-text">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn">Continue</button>
+        {% endif %}
+    </form>
+</div>
+
+<div class="footer">
+    <div class="text-center text-muted">
+        EduVerifi Admin Portal • Two-Factor Authentication Required
+    </div>
+</div>
+{% endblock %}

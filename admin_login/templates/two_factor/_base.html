@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EduVerifi Admin{% endblock %}</title>
+    <style>
+        /* Swiss Design + Django Admin Fusion */
+        :root {
+            --primary: #417690;
+            --primary-dark: #205067;
+            --success: #198754;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --light-gray: #f8f9fa;
+            --mid-gray: #dee2e6;
+            --dark-gray: #495057;
+            --text: #212529;
+            --grid-unit: 8px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: calc(var(--grid-unit) * 3);
+        }
+        
+        .container {
+            background: white;
+            border-radius: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            width: 100%;
+            max-width: 480px;
+            border: 1px solid var(--mid-gray);
+        }
+        
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: calc(var(--grid-unit) * 3) calc(var(--grid-unit) * 4);
+            border-bottom: 3px solid var(--primary-dark);
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+        
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: calc(var(--grid-unit) * 0.5);
+        }
+        
+        .content {
+            padding: calc(var(--grid-unit) * 4);
+        }
+        
+        .form-row {
+            margin-bottom: calc(var(--grid-unit) * 2);
+        }
+        
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--dark-gray);
+            margin-bottom: calc(var(--grid-unit) * 1);
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: calc(var(--grid-unit) * 1.5) calc(var(--grid-unit) * 1.5);
+            border: 1px solid var(--mid-gray);
+            border-radius: 0;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+            transition: all 0.2s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(65, 118, 144, 0.1);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: calc(var(--grid-unit) * 1.5) calc(var(--grid-unit) * 3);
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0;
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            width: 100%;
+            margin-top: calc(var(--grid-unit) * 2);
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .messages {
+            margin-bottom: calc(var(--grid-unit) * 3);
+        }
+        
+        .message {
+            padding: calc(var(--grid-unit) * 1.5) calc(var(--grid-unit) * 2);
+            border-left: 3px solid;
+            font-size: 13px;
+            margin-bottom: calc(var(--grid-unit) * 1);
+        }
+        
+        .message.error, .errornote {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: var(--danger);
+        }
+        
+        .message.warning {
+            background: #fffbeb;
+            color: #92400e;
+            border-color: var(--warning);
+        }
+        
+        .message.success {
+            background: #f0fdf4;
+            color: #166534;
+            border-color: var(--success);
+        }
+        
+        .message.info {
+            background: #eff6ff;
+            color: #1e40af;
+            border-color: var(--primary);
+        }
+        
+        .help-text {
+            font-size: 11px;
+            color: var(--dark-gray);
+            margin-top: calc(var(--grid-unit) * 0.5);
+            line-height: 1.4;
+        }
+        
+        .footer {
+            background: var(--light-gray);
+            padding: calc(var(--grid-unit) * 3) calc(var(--grid-unit) * 4);
+            border-top: 1px solid var(--mid-gray);
+            font-size: 12px;
+            color: var(--dark-gray);
+        }
+        
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: calc(var(--grid-unit) * 2);
+        }
+        
+        .qr-code {
+            text-align: center;
+            padding: calc(var(--grid-unit) * 3);
+            background: var(--light-gray);
+            margin: calc(var(--grid-unit) * 3) 0;
+        }
+        
+        .qr-code img {
+            max-width: 200px;
+            height: auto;
+            border: 1px solid var(--mid-gray);
+            padding: calc(var(--grid-unit) * 2);
+            background: white;
+        }
+        
+        .divider {
+            height: 1px;
+            background: var(--mid-gray);
+            margin: calc(var(--grid-unit) * 3) 0;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-muted {
+            color: var(--dark-gray);
+        }
+        
+        .mt-2 { margin-top: calc(var(--grid-unit) * 2); }
+        .mt-3 { margin-top: calc(var(--grid-unit) * 3); }
+        .mb-2 { margin-bottom: calc(var(--grid-unit) * 2); }
+        .mb-3 { margin-bottom: calc(var(--grid-unit) * 3); }
+        
+        /* Django-style error lists */
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            margin: calc(var(--grid-unit) * 1) 0;
+        }
+        
+        .errorlist li {
+            background: #fef2f2;
+            color: #991b1b;
+            padding: calc(var(--grid-unit) * 1) calc(var(--grid-unit) * 1.5);
+            border-left: 3px solid var(--danger);
+            font-size: 12px;
+            margin-bottom: calc(var(--grid-unit) * 0.5);
+        }
+        
+        /* Two-factor specific */
+        .wizard-step {
+            display: flex;
+            justify-content: center;
+            margin-bottom: calc(var(--grid-unit) * 3);
+        }
+        
+        .wizard-step-item {
+            padding: calc(var(--grid-unit) * 1) calc(var(--grid-unit) * 2);
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--mid-gray);
+            margin: 0 -1px;
+        }
+        
+        .wizard-step-item.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            z-index: 1;
+            position: relative;
+        }
+        
+        .backup-codes {
+            background: #fffbeb;
+            border: 1px solid #fbbf24;
+            padding: calc(var(--grid-unit) * 2);
+            margin: calc(var(--grid-unit) * 3) 0;
+        }
+        
+        .backup-codes h3 {
+            font-size: 14px;
+            margin-bottom: calc(var(--grid-unit) * 1);
+            color: #92400e;
+        }
+        
+        .backup-codes ul {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: calc(var(--grid-unit) * 1);
+        }
+        
+        .backup-codes li {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            background: white;
+            padding: calc(var(--grid-unit) * 1);
+            border: 1px solid var(--mid-gray);
+        }
+    </style>
+</head>
+<body>
+    {% block content_wrapper %}
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    {% endblock %}
+</body>
+</html>

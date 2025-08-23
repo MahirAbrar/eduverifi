@@ -1,0 +1,68 @@
+{% extends "admin_login/base.html" %}
+
+{% block title %}Setup Two-Factor Authentication - EduVerifi{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Setup Two-Factor Authentication</h1>
+    <p>Secure your admin account with 2FA</p>
+</div>
+
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ wizard.management_form }}
+    
+    {% if wizard.steps.current == 'generator' %}
+        <div class="qr-code">
+            <h3>Scan this QR code with your authenticator app:</h3>
+            <img src="{{ QR_URL }}" alt="QR Code">
+        </div>
+        
+        <div class="notice">
+            <p><strong>Secret Key:</strong> {{ secret_key }}</p>
+            <p>Use apps like Google Authenticator, Authy, or Microsoft Authenticator</p>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_token">Enter the 6-digit code from your app to verify:</label>
+            {{ wizard.form.token }}
+        </div>
+    {% endif %}
+    
+    {% if wizard.steps.current == 'sms' %}
+        <div class="form-group">
+            <label for="id_number">Phone Number:</label>
+            {{ wizard.form.number }}
+        </div>
+    {% endif %}
+    
+    {% if backup_tokens %}
+        <div class="backup-codes">
+            <h3>⚠️ Save these backup codes!</h3>
+            <p>Use these codes if you lose access to your authenticator app:</p>
+            <ul>
+                {% for token in backup_tokens %}
+                    <li>{{ token }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    
+    <button type="submit" class="btn">
+        {% if wizard.steps.prev %}Back{% endif %}
+        {% if wizard.steps.next %}Next{% else %}Complete Setup{% endif %}
+    </button>
+</form>
+
+<div class="links">
+    <a href="{% url 'admin_login:login' %}">← Back to login</a>
+</div>
+{% endblock %}
