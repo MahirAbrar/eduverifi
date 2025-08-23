@@ -18,15 +18,24 @@ from django.contrib import admin
 from django.urls import path, include
 from django_otp.admin import OTPAdminSite
 from two_factor.urls import urlpatterns as tf_urls
+from admin_login.views import account_redirect
 
 # Replace the default admin site with OTP-protected admin
 admin.site.__class__ = OTPAdminSite
 admin.site.site_header = 'EduVerifi Admin'
 admin.site.site_title = 'EduVerifi Admin Portal'
 
+# Extract the two_factor patterns and namespace
+tf_patterns, tf_namespace = tf_urls
+
+# Create custom patterns with our redirect at the root
+custom_patterns = [
+    path('account/', account_redirect, name='account_home'),  # Our custom redirect
+] + tf_patterns
+
 urlpatterns = [
-    # Include two_factor URLs at root for admin compatibility
-    path('', include(tf_urls)),
     # Admin panel
     path('admin/', admin.site.urls),
+    # Include modified two_factor URLs with our custom redirect
+    path('', include((custom_patterns, tf_namespace))),
 ]

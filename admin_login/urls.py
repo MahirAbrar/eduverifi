@@ -4,9 +4,11 @@ from . import views
 
 app_name = 'admin_login'
 
-# We need to include two_factor URLs with proper namespace
 urlpatterns = [
-    # Include all two_factor URLs (they expect 'two_factor' namespace)
+    # Smart redirect for /account/ based on authentication status
+    path('', views.account_redirect, name='account_redirect'),
+    
+    # Include all two_factor URLs (they come as a tuple with namespace)
     path('', include(tf_urls)),
     
     # Override the login to use our custom version if needed

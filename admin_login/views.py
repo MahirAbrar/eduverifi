@@ -6,6 +6,26 @@ from two_factor.views import LoginView
 from two_factor.utils import default_device
 
 
+def account_redirect(request):
+    """
+    Smart redirect for /account/ based on user's authentication status.
+    """
+    print(f"DEBUG: account_redirect called, user authenticated: {request.user.is_authenticated}")
+    
+    if not request.user.is_authenticated:
+        # Not logged in -> go to login
+        print("DEBUG: Redirecting to login")
+        return redirect('/account/login/')
+    
+    if not default_device(request.user):
+        # Logged in but no 2FA -> go to setup
+        messages.info(request, "Please set up two-factor authentication for enhanced security.")
+        return redirect('/account/two_factor/setup/')
+    
+    # Logged in with 2FA -> go to profile
+    return redirect('/account/two_factor/')
+
+
 class AdminLoginView(LoginView):
     """
     Custom login view that enforces 2FA setup for admin access.
